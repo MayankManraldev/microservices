@@ -1,0 +1,28 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: orderModule
+          uri: lb://order-service
+          predicates:
+            - Path=/orderService/*
+            - Method=GET,POST,PUT,DELETE,PATCH
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: genericFallback
+                fallbackUri: forward:/fallback/genericFallback
+        - id: paymentModule
+          uri: lb://payment-service
+          predicates:
+            - Path=/paymentService/*
+            - Method=GET,POST,PUT,DELETE,PATCH
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: genericFallback
+                fallbackUri: forward:/fallback/genericFallback
